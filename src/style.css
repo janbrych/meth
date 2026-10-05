@@ -1,0 +1,272 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #1a1a24;
+  font-family: 'Press Start 2P', monospace, sans-serif;
+  color: #ffffff;
+}
+
+#app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Pixel UI styling */
+.pixel-panel {
+  background: #2b2b38;
+  border: 4px solid #4a4a68;
+  box-shadow: inset -4px -4px 0px #151520, inset 4px 4px 0px #686890;
+  padding: 10px;
+}
+
+#hud {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  font-size: 11px;
+}
+
+.hud-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-bar-container .label {
+  min-width: 90px;
+}
+
+.bar-outer {
+  width: 120px;
+  height: 14px;
+  background: #111;
+  border: 2px solid #555;
+  position: relative;
+}
+
+.bar-inner {
+  height: 100%;
+  width: 100%;
+  transition: width 0.2s ease;
+}
+
+.bar-inner.hp { background: #e74c3c; }
+.bar-inner.hunger { background: #e67e22; }
+.bar-inner.thirst { background: #3498db; }
+
+.hud-badge {
+  background: #1e1e28;
+  padding: 8px 14px;
+  border: 2px solid #5d5d88;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.coin-badge {
+  color: #f1c40f;
+}
+
+.hud-right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.pixel-btn {
+  background: #34495e;
+  color: #fff;
+  border: 3px solid #2c3e50;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 10px;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0px #1a252f, inset 2px 2px 0px #4e6d8c;
+}
+
+.pixel-btn:hover {
+  background: #415b76;
+}
+
+.pixel-btn:active {
+  box-shadow: inset 2px 2px 0px #1a252f;
+}
+
+/* Modals */
+.modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal.hidden {
+  display: none !important;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 600px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+}
+
+.shop-panel {
+  max-width: 800px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #4a4a68;
+  padding-bottom: 10px;
+}
+
+.modal-header h2 {
+  font-size: 14px;
+  color: #f39c12;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.option-btn {
+  padding: 14px;
+  font-size: 11px;
+  background: #2c3e50;
+  border: 2px solid #5d5d88;
+  color: #fff;
+  cursor: pointer;
+  text-align: center;
+  word-break: break-word;
+}
+
+.option-btn:hover {
+  background: #2980b9;
+}
+
+.shop-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 8px;
+  font-family: inherit;
+  font-size: 10px;
+  background: #1e1e28;
+  color: #aaa;
+  border: 2px solid #4a4a68;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background: #f39c12;
+  color: #000;
+  border-color: #fff;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.shop-card {
+  background: #1e1e28;
+  border: 2px solid #4a4a68;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  font-size: 10px;
+}
+
+.shop-card img, .shop-card .icon {
+  font-size: 32px;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #ff5555;
+}
+
+.toast {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.85);
+  border: 2px solid #f39c12;
+  color: #f1c40f;
+  padding: 10px 20px;
+  font-size: 11px;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.toast.hidden {
+  display: none;
+}
+
+.controls-hint {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: #aaa;
+  background: rgba(0,0,0,0.6);
+  padding: 4px 10px;
+  border-radius: 4px;
+  pointer-events: none;
+}

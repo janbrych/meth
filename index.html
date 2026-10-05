@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matematická Arkáda - Pixel Quest</title>
+  <link rel="stylesheet" href="/src/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Top UI Overlay / HUD -->
+    <div id="hud" class="pixel-panel">
+      <div class="hud-left">
+        <div class="stat-bar-container">
+          <span class="label">❤️ Životy:</span>
+          <div class="bar-outer"><div id="hp-bar" class="bar-inner hp"></div></div>
+          <span id="hp-text">100/100</span>
+        </div>
+        <div class="stat-bar-container">
+          <span class="label">🍖 Hlad:</span>
+          <div class="bar-outer"><div id="hunger-bar" class="bar-inner hunger"></div></div>
+          <span id="hunger-text">100%</span>
+        </div>
+        <div class="stat-bar-container">
+          <span class="label">💧 Žízeň:</span>
+          <div class="bar-outer"><div id="thirst-bar" class="bar-inner thirst"></div></div>
+          <span id="thirst-text">100%</span>
+        </div>
+      </div>
+
+      <div class="hud-center">
+        <div id="time-display" class="hud-badge">🌞 Den 1 | 08:00</div>
+      </div>
+
+      <div class="hud-right">
+        <div class="hud-badge coin-badge">🪙 <span id="coin-count">0</span> mincí</div>
+        <button id="btn-shop" class="pixel-btn">🏪 Obchod [B]</button>
+        <button id="btn-editor" class="pixel-btn">🏠 Editor Základny [E]</button>
+      </div>
+    </div>
+
+    <!-- Math Battle Modal Popup -->
+    <div id="math-modal" class="modal hidden">
+      <div class="modal-content pixel-panel">
+        <div class="modal-header">
+          <h2>⚔️ MATEMATICKÁ VÝZVA ⚔️</h2>
+          <div id="enemy-info-badge">Enemák Level 1</div>
+        </div>
+        <div class="modal-body">
+          <p id="math-question">Spočítej průměr: 2 + 2 = ?</p>
+          <div id="math-options" class="options-grid"></div>
+        </div>
+        <div id="math-feedback" class="feedback"></div>
+      </div>
+    </div>
+
+    <!-- Shop Modal Popup -->
+    <div id="shop-modal" class="modal hidden">
+      <div class="modal-content pixel-panel shop-panel">
+        <div class="modal-header">
+          <h2>🏪 MAGICKÝ OBCHOD 🏪</h2>
+          <button id="btn-close-shop" class="close-btn">❌</button>
+        </div>
+        <div class="shop-tabs">
+          <button class="tab-btn active" data-tab="food">🍕 Jídlo & Pití</button>
+          <button class="tab-btn" data-tab="weapons">⚔️ Zbraně</button>
+          <button class="tab-btn" data-tab="skins">🎭 Skiny</button>
+          <button class="tab-btn" data-tab="furniture">🪑 Nábytek</button>
+          <button class="tab-btn" data-tab="farms">🌾 Farmy</button>
+        </div>
+        <div id="shop-items-container" class="shop-grid"></div>
+      </div>
+    </div>
+
+    <!-- Controls / Toast Overlay -->
+    <div id="toast" class="toast hidden"></div>
+    <div id="controls-hint" class="controls-hint">
+      WASD/Šipky: Pohyb | Mezerník/Klik: Útok | E: Editor | B: Obchod
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
