@@ -1,3 +1,4 @@
+import './style.css';
 import { GameState } from './gameState';
 import { Renderer } from './renderer';
 import { CombatSystem } from './combatSystem';
@@ -65,18 +66,14 @@ let gameStarted = false;
 let isEditorMode = false;
 let activeShopTab = 'food';
 
-// Simulated loading progress
-let loadProgress = 0;
-const loadingInterval = setInterval(() => {
-  loadProgress += Math.floor(Math.random() * 25) + 15;
-  if (loadProgress >= 100) {
-    loadProgress = 100;
-    clearInterval(loadingInterval);
-    loadingText.textContent = 'Příprava světa dokončena!';
-    btnStartGame.classList.remove('hidden');
-  }
-  loadingBarFill.style.width = `${loadProgress}%`;
-}, 150);
+// Notify inline loading script that module loading is complete
+if (typeof (window as any).__finishLoading === 'function') {
+  (window as any).__finishLoading();
+} else {
+  loadingBarFill.style.width = '100%';
+  loadingText.textContent = 'Příprava světa dokončena!';
+  btnStartGame.classList.remove('hidden');
+}
 
 btnStartGame.onclick = () => {
   sounds.playSuccess();
