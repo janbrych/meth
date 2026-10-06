@@ -35,6 +35,116 @@ export class Renderer {
     this.renderDayNightOverlay(state, cameraX, cameraY);
 
     ctx.restore();
+
+    this.renderMinimap(state);
+  }
+
+  renderMinimap(state: GameState) {
+    const ctx = this.ctx;
+    const size = 120;
+    const padding = 12;
+    const x = this.canvas.width - size - padding;
+    const y = this.canvas.height - size - padding - 30;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(20, 25, 35, 0.85)';
+    ctx.strokeStyle = '#4a4a68';
+    ctx.lineWidth = 3;
+    ctx.fillRect(x, y, size, size);
+    ctx.strokeRect(x, y, size, size);
+
+    const scale = size / state.mapSize.width;
+
+    // House
+    ctx.fillStyle = '#f39c12';
+    const h = state.houseBounds;
+    ctx.fillRect(x + h.x * scale, y + h.y * scale, h.width * scale, h.height * scale);
+
+    // Farms
+    ctx.fillStyle = '#2ecc71';
+    for (const farm of state.placedFarms) {
+      ctx.fillRect(x + farm.x * scale - 2, y + farm.y * scale - 2, 5, 5);
+    }
+
+    // Enemies
+    ctx.fillStyle = '#e74c3c';
+    for (const enemy of state.enemies) {
+      ctx.fillRect(x + enemy.x * scale - 2, y + enemy.y * scale - 2, 4, 4);
+    }
+
+    // Player
+    ctx.fillStyle = '#3498db';
+    ctx.beginPath();
+    ctx.arc(x + state.player.x * scale, y + state.player.y * scale, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '8px "Press Start 2P"';
+    ctx.fillText('MAPA', x + 4, y + 12);
+
+    ctx.restore();
+  }
+
+  renderFullMap(state: GameState, targetCanvas: HTMLCanvasElement) {
+    const ctx = targetCanvas.getContext('2d');
+    if (!ctx) return;
+
+    const width = targetCanvas.width;
+    const height = targetCanvas.height;
+
+    ctx.fillStyle = '#1c3818';
+    ctx.fillRect(0, 0, width, height);
+
+    const scaleX = width / state.mapSize.width;
+    const scaleY = height / state.mapSize.height;
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = 1;
+    for (let gx = 0; gx < width; gx += 40) {
+      ctx.beginPath();
+      ctx.moveTo(gx, 0);
+      ctx.lineTo(gx, height);
+      ctx.stroke();
+    }
+    for (let gy = 0; gy < height; gy += 40) {
+      ctx.beginPath();
+      ctx.moveTo(0, gy);
+      ctx.lineTo(width, gy);
+      ctx.stroke();
+    }
+
+    // House
+    ctx.fillStyle = '#f39c12';
+    const h = state.houseBounds;
+    ctx.fillRect(h.x * scaleX, h.y * scaleY, h.width * scaleX, h.height * scaleY);
+    ctx.strokeStyle = '#ffffff';
+    ctx.strokeRect(h.x * scaleX, h.y * scaleY, h.width * scaleX, h.height * scaleY);
+
+    // Farms
+    ctx.fillStyle = '#2ecc71';
+    for (const farm of state.placedFarms) {
+      ctx.beginPath();
+      ctx.arc(farm.x * scaleX, farm.y * scaleY, 6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Enemies
+    ctx.fillStyle = '#e74c3c';
+    for (const enemy of state.enemies) {
+      ctx.beginPath();
+      ctx.arc(enemy.x * scaleX, enemy.y * scaleY, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Player
+    ctx.fillStyle = '#3498db';
+    ctx.beginPath();
+    ctx.arc(state.player.x * scaleX, state.player.y * scaleY, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
   }
 
   renderGround(state: GameState) {

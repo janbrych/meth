@@ -38,6 +38,7 @@
 
       <div class="hud-right">
         <div class="hud-badge coin-badge">🪙 <span id="coin-count">0</span> mincí</div>
+        <button id="btn-map" class="pixel-btn">🗺️ Mapa [M]</button>
         <button id="btn-fullscreen" class="pixel-btn">⛶ Celá obrazovka [F]</button>
         <button id="btn-shop" class="pixel-btn">🏪 Obchod [B]</button>
         <button id="btn-editor" class="pixel-btn">🏠 Editor Základny [E]</button>
@@ -56,6 +57,25 @@
           <div id="math-options" class="options-grid"></div>
         </div>
         <div id="math-feedback" class="feedback"></div>
+      </div>
+    </div>
+
+    <!-- World Map Modal Popup -->
+    <div id="map-modal" class="modal hidden">
+      <div class="modal-content pixel-panel map-panel">
+        <div class="modal-header">
+          <h2>🗺️ MAPA SVĚTA (2000 x 2000) 🗺️</h2>
+          <button id="btn-close-map" class="close-btn">❌</button>
+        </div>
+        <div class="map-body">
+          <canvas id="mapCanvas" width="500" height="500"></canvas>
+          <div class="map-legend">
+            <div><span class="dot player-dot"></span> Hráč (Vy)</div>
+            <div><span class="dot house-dot"></span> Bezpečný Dům</div>
+            <div><span class="dot enemy-dot"></span> Nepřítel</div>
+            <div><span class="dot farm-dot"></span> Farma</div>
+          </div>
+        </div>
       </div>
     </div>
 

@@ -260,6 +260,46 @@ canvas {
   display: none;
 }
 
+.map-panel {
+  max-width: 650px;
+}
+
+.map-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+#mapCanvas {
+  border: 4px solid #4a4a68;
+  background: #1c3818;
+  image-rendering: pixelated;
+  width: 400px;
+  height: 400px;
+}
+
+.map-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.map-legend .dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.player-dot { background: #3498db; }
+.house-dot { background: #f39c12; }
+.enemy-dot { background: #e74c3c; }
+.farm-dot { background: #2ecc71; }
+
 .controls-hint {
   position: absolute;
   bottom: 8px;

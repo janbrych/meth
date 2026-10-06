@@ -14,6 +14,8 @@ function resizeCanvas() {
   ctx.imageSmoothingEnabled = false;
 }
 window.addEventListener('resize', resizeCanvas);
+document.addEventListener('fullscreenchange', resizeCanvas);
+document.addEventListener('webkitfullscreenchange', resizeCanvas);
 resizeCanvas();
 
 const state = new GameState();
@@ -43,6 +45,11 @@ const btnCloseShop = document.getElementById('btn-close-shop') as HTMLElement;
 const btnEditor = document.getElementById('btn-editor') as HTMLElement;
 const btnFullscreen = document.getElementById('btn-fullscreen') as HTMLElement;
 
+const mapModal = document.getElementById('map-modal') as HTMLElement;
+const mapCanvas = document.getElementById('mapCanvas') as HTMLCanvasElement;
+const btnMap = document.getElementById('btn-map') as HTMLElement;
+const btnCloseMap = document.getElementById('btn-close-map') as HTMLElement;
+
 const toastEl = document.getElementById('toast') as HTMLElement;
 
 let isEditorMode = false;
@@ -62,11 +69,15 @@ window.addEventListener('keydown', (e) => {
   if ((e.key === 'b' || e.key === 'B') && !isModalOpen()) {
     openShop();
   }
+  if ((e.key === 'm' || e.key === 'M') && !isModalOpen()) {
+    openMap();
+  }
   if ((e.key === 'f' || e.key === 'F') && !isModalOpen()) {
     toggleFullscreen();
   }
   if (e.key === 'Escape') {
     closeShop();
+    closeMap();
   }
 });
 
@@ -96,7 +107,7 @@ canvas.addEventListener('click', (e) => {
 });
 
 function isModalOpen(): boolean {
-  return !mathModal.classList.contains('hidden') || !shopModal.classList.contains('hidden');
+  return !mathModal.classList.contains('hidden') || !shopModal.classList.contains('hidden') || !mapModal.classList.contains('hidden');
 }
 
 function showToast(msg: string) {
@@ -195,15 +206,31 @@ btnShop.onclick = () => openShop();
 btnCloseShop.onclick = () => closeShop();
 btnEditor.onclick = () => toggleEditorMode();
 btnFullscreen.onclick = () => toggleFullscreen();
+btnMap.onclick = () => openMap();
+btnCloseMap.onclick = () => closeMap();
+
+function openMap() {
+  renderer.renderFullMap(state, mapCanvas);
+  mapModal.classList.remove('hidden');
+}
+
+function closeMap() {
+  mapModal.classList.add('hidden');
+}
 
 function toggleFullscreen() {
+  const elem = document.documentElement as any;
   if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch((err) => {
-      showToast(`Chyba celoobrazovkového režimu: ${err.message}`);
-    });
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen().then(() => resizeCanvas()).catch((err: any) => {
+        showToast(`Chyba celoobrazovkového režimu: ${err.message}`);
+      });
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+    }
   } else {
     if (document.exitFullscreen) {
-      document.exitFullscreen();
+      document.exitFullscreen().then(() => resizeCanvas());
     }
   }
 }

@@ -12,3 +12,8 @@
 7:37:48 AM [vite] page reload index.html
 7:38:02 AM [vite] page reload src/main.ts
 7:38:05 AM [vite] hmr update /src/style.css?direct
+8:19:12 AM [vite] page reload src/main.ts
+8:19:32 AM [vite] page reload index.html
+8:19:37 AM [vite] hmr update /src/style.css?direct
+8:19:46 AM [vite] page reload src/renderer.ts
+8:19:54 AM [vite] page reload src/main.ts
