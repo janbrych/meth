@@ -56,8 +56,33 @@ const btnCloseMap = document.getElementById('btn-close-map') as HTMLElement;
 
 const toastEl = document.getElementById('toast') as HTMLElement;
 
+const loadingScreen = document.getElementById('loading-screen') as HTMLElement;
+const loadingBarFill = document.getElementById('loading-bar-fill') as HTMLElement;
+const loadingText = document.getElementById('loading-text') as HTMLElement;
+const btnStartGame = document.getElementById('btn-start-game') as HTMLElement;
+
+let gameStarted = false;
 let isEditorMode = false;
 let activeShopTab = 'food';
+
+// Simulated loading progress
+let loadProgress = 0;
+const loadingInterval = setInterval(() => {
+  loadProgress += Math.floor(Math.random() * 25) + 15;
+  if (loadProgress >= 100) {
+    loadProgress = 100;
+    clearInterval(loadingInterval);
+    loadingText.textContent = 'Příprava světa dokončena!';
+    btnStartGame.classList.remove('hidden');
+  }
+  loadingBarFill.style.width = `${loadProgress}%`;
+}, 150);
+
+btnStartGame.onclick = () => {
+  sounds.playSuccess();
+  loadingScreen.style.display = 'none';
+  gameStarted = true;
+};
 
 const keys: { [key: string]: boolean } = {};
 
@@ -111,7 +136,7 @@ canvas.addEventListener('click', (e) => {
 });
 
 function isModalOpen(): boolean {
-  return !mathModal.classList.contains('hidden') || !shopModal.classList.contains('hidden') || !mapModal.classList.contains('hidden');
+  return !gameStarted || !mathModal.classList.contains('hidden') || !shopModal.classList.contains('hidden') || !mapModal.classList.contains('hidden');
 }
 
 function showToast(msg: string) {

@@ -9,6 +9,19 @@
 </head>
 <body>
   <div id="app">
+    <!-- Loading Screen Overlay -->
+    <div id="loading-screen" class="loading-screen">
+      <div class="loading-panel pixel-panel">
+        <h1>✨ PIXEL QUEST ✨</h1>
+        <h2>MATEMATICKÁ ARKÁDA</h2>
+        <div class="loading-bar-container">
+          <div id="loading-bar-fill" class="loading-bar-fill"></div>
+        </div>
+        <div id="loading-text" class="loading-text">Načítání světa...</div>
+        <button id="btn-start-game" class="pixel-btn start-btn hidden">▶️ SPUSTIT HRU</button>
+      </div>
+    </div>
+
     <!-- Game Canvas -->
     <canvas id="gameCanvas"></canvas>
 
