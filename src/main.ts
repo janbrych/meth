@@ -9,9 +9,13 @@ const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  ctx.imageSmoothingEnabled = false;
+  if (window.innerWidth > 0 && window.innerHeight > 0) {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ctx.imageSmoothingEnabled = false;
+    (ctx as any).webkitImageSmoothingEnabled = false;
+    (ctx as any).mozImageSmoothingEnabled = false;
+  }
 }
 window.addEventListener('resize', resizeCanvas);
 document.addEventListener('fullscreenchange', resizeCanvas);
@@ -341,6 +345,9 @@ function updateHUD() {
 }
 
 function loop() {
+  if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+    resizeCanvas();
+  }
   update(1 / 60);
   renderer.render(state, isEditorMode);
   requestAnimationFrame(loop);
