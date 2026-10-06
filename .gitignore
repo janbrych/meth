@@ -1,3 +1,7 @@
 node_modules
 dist
 .vite
+dev_server.log
+test-results
+playwright-report
+*.log
