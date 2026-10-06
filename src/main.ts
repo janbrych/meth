@@ -10,14 +10,17 @@ const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 function resizeCanvas() {
-  if (window.innerWidth > 0 && window.innerHeight > 0) {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+  const w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  const h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  if (w > 0 && h > 0) {
+    canvas.width = w;
+    canvas.height = h;
     ctx.imageSmoothingEnabled = false;
     (ctx as any).webkitImageSmoothingEnabled = false;
     (ctx as any).mozImageSmoothingEnabled = false;
   }
 }
+
 window.addEventListener('resize', resizeCanvas);
 document.addEventListener('fullscreenchange', resizeCanvas);
 document.addEventListener('webkitfullscreenchange', resizeCanvas);
@@ -66,29 +69,37 @@ let gameStarted = false;
 let isEditorMode = false;
 let activeShopTab = 'food';
 
-// Notify inline loading script that module loading is complete
-if (typeof (window as any).__finishLoading === 'function') {
-  (window as any).__finishLoading();
-} else {
-  loadingBarFill.style.width = '100%';
-  loadingText.textContent = 'Příprava světa dokončena!';
-  btnStartGame.classList.remove('hidden');
-}
+// Animate loading bar to 100% and show start button
+let progress = 0;
+const loadTimer = setInterval(() => {
+  progress += 25;
+  if (loadingBarFill) loadingBarFill.style.width = Math.min(100, progress) + '%';
+  if (progress >= 100) {
+    clearInterval(loadTimer);
+    if (loadingText) loadingText.textContent = 'Svět připraven! Klikni na tlačítko dole.';
+    if (btnStartGame) btnStartGame.classList.remove('hidden');
+  }
+}, 100);
 
-function startGame() {
+function startGame(e?: Event) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
   gameStarted = true;
-  loadingScreen.style.display = 'none';
-  loadingScreen.style.visibility = 'hidden';
-  loadingScreen.classList.add('hidden');
+  if (loadingScreen) {
+    loadingScreen.style.display = 'none';
+    loadingScreen.classList.add('hidden');
+  }
   try { sounds.playSuccess(); } catch (_e) {}
   resizeCanvas();
 }
 
-(window as any).__onGameStart = startGame;
-(window as any).__startGame = startGame;
-btnStartGame.addEventListener('click', startGame);
-btnStartGame.addEventListener('pointerdown', startGame);
-btnStartGame.addEventListener('touchstart', startGame);
+if (btnStartGame) {
+  btnStartGame.addEventListener('click', startGame);
+  btnStartGame.addEventListener('pointerdown', startGame);
+  btnStartGame.addEventListener('touchstart', startGame);
+}
 
 const keys: { [key: string]: boolean } = {};
 
@@ -376,10 +387,6 @@ function updateHUD() {
 }
 
 function loop() {
-  if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
-    resizeCanvas();
-  }
-  update(1 / 60);
   renderer.render(state, isEditorMode);
   requestAnimationFrame(loop);
 }
