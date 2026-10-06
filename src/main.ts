@@ -75,11 +75,18 @@ if (typeof (window as any).__finishLoading === 'function') {
   btnStartGame.classList.remove('hidden');
 }
 
-btnStartGame.onclick = () => {
-  sounds.playSuccess();
-  loadingScreen.style.display = 'none';
+function startGame() {
   gameStarted = true;
-};
+  loadingScreen.style.display = 'none';
+  loadingScreen.classList.add('hidden');
+  try { sounds.playSuccess(); } catch (_e) {}
+  resizeCanvas();
+}
+
+(window as any).__startGame = startGame;
+btnStartGame.addEventListener('click', startGame);
+btnStartGame.addEventListener('pointerdown', startGame);
+btnStartGame.addEventListener('touchstart', startGame);
 
 const keys: { [key: string]: boolean } = {};
 
