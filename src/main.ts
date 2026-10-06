@@ -69,18 +69,6 @@ let gameStarted = false;
 let isEditorMode = false;
 let activeShopTab = 'food';
 
-// Animate loading bar to 100% and show start button
-let progress = 0;
-const loadTimer = setInterval(() => {
-  progress += 25;
-  if (loadingBarFill) loadingBarFill.style.width = Math.min(100, progress) + '%';
-  if (progress >= 100) {
-    clearInterval(loadTimer);
-    if (loadingText) loadingText.textContent = 'Svět připraven! Klikni na tlačítko dole.';
-    if (btnStartGame) btnStartGame.classList.remove('hidden');
-  }
-}, 100);
-
 function startGame(e?: Event) {
   if (e) {
     e.preventDefault();
@@ -95,10 +83,21 @@ function startGame(e?: Event) {
   resizeCanvas();
 }
 
+(window as any).__onGameStart = startGame;
+(window as any).__forceStartGame = startGame;
+
 if (btnStartGame) {
   btnStartGame.addEventListener('click', startGame);
   btnStartGame.addEventListener('pointerdown', startGame);
   btnStartGame.addEventListener('touchstart', startGame);
+}
+
+// Ensure loading bar finishes and start button turns visible
+if (loadingBarFill) loadingBarFill.style.width = '100%';
+if (loadingText) loadingText.textContent = 'Příprava sveta dokončena!';
+if (btnStartGame) {
+  btnStartGame.classList.remove('hidden');
+  btnStartGame.style.display = 'block';
 }
 
 const keys: { [key: string]: boolean } = {};
