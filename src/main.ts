@@ -78,11 +78,13 @@ if (typeof (window as any).__finishLoading === 'function') {
 function startGame() {
   gameStarted = true;
   loadingScreen.style.display = 'none';
+  loadingScreen.style.visibility = 'hidden';
   loadingScreen.classList.add('hidden');
   try { sounds.playSuccess(); } catch (_e) {}
   resizeCanvas();
 }
 
+(window as any).__onGameStart = startGame;
 (window as any).__startGame = startGame;
 btnStartGame.addEventListener('click', startGame);
 btnStartGame.addEventListener('pointerdown', startGame);

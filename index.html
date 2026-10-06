@@ -18,7 +18,7 @@
           <div id="loading-bar-fill" class="loading-bar-fill"></div>
         </div>
         <div id="loading-text" class="loading-text">Načítání světa...</div>
-        <button id="btn-start-game" class="pixel-btn start-btn hidden" onclick="window.__startGame && window.__startGame()">▶️ SPUSTIT HRU</button>
+        <button id="btn-start-game" class="pixel-btn start-btn hidden" onclick="window.__startGame(event)" onpointerdown="window.__startGame(event)" ontouchstart="window.__startGame(event)">▶️ SPUSTIT HRU</button>
       </div>
     </div>
 
@@ -137,13 +137,29 @@
         clearInterval(timer);
         if (bar) bar.style.width = '100%';
         if (text) text.textContent = 'Příprava světa dokončena!';
-        if (btn) btn.classList.remove('hidden');
+        if (btn) {
+          btn.classList.remove('hidden');
+          btn.style.display = 'block';
+        }
       };
 
-      // Fallback auto-finish after 1.5 seconds if main.ts loads quickly
+      window.__startGame = function(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        var screen = document.getElementById('loading-screen');
+        if (screen) {
+          screen.style.display = 'none';
+          screen.style.visibility = 'hidden';
+          screen.classList.add('hidden');
+        }
+        if (typeof window.__onGameStart === 'function') {
+          window.__onGameStart();
+        }
+      };
+
+      // Fallback auto-finish after 1 second
       setTimeout(function() {
         if (window.__finishLoading) window.__finishLoading();
-      }, 1200);
+      }, 1000);
     })();
   </script>
   <script type="module" src="./src/main.ts"></script>
