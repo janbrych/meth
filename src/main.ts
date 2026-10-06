@@ -41,6 +41,7 @@ const shopItemsContainer = document.getElementById('shop-items-container') as HT
 const btnShop = document.getElementById('btn-shop') as HTMLElement;
 const btnCloseShop = document.getElementById('btn-close-shop') as HTMLElement;
 const btnEditor = document.getElementById('btn-editor') as HTMLElement;
+const btnFullscreen = document.getElementById('btn-fullscreen') as HTMLElement;
 
 const toastEl = document.getElementById('toast') as HTMLElement;
 
@@ -60,6 +61,9 @@ window.addEventListener('keydown', (e) => {
   }
   if ((e.key === 'b' || e.key === 'B') && !isModalOpen()) {
     openShop();
+  }
+  if ((e.key === 'f' || e.key === 'F') && !isModalOpen()) {
+    toggleFullscreen();
   }
   if (e.key === 'Escape') {
     closeShop();
@@ -190,6 +194,19 @@ function handleMathAnswer(chosenOption: string) {
 btnShop.onclick = () => openShop();
 btnCloseShop.onclick = () => closeShop();
 btnEditor.onclick = () => toggleEditorMode();
+btnFullscreen.onclick = () => toggleFullscreen();
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch((err) => {
+      showToast(`Chyba celoobrazovkového režimu: ${err.message}`);
+    });
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+}
 
 function openShop() {
   renderShopItems();
