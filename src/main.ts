@@ -5,6 +5,7 @@ import { CombatSystem } from './combatSystem';
 import { ShopSystem, SHOP_ITEMS } from './shopSystem';
 import { MathQuestion } from './mathGenerator';
 import { sounds } from './audio';
+import { AssetLoader } from './assetLoader';
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -12,9 +13,12 @@ const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 function resizeCanvas() {
   const w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
   const h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
   if (w > 0 && h > 0) {
-    canvas.width = w;
-    canvas.height = h;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
     ctx.imageSmoothingEnabled = false;
     (ctx as any).webkitImageSmoothingEnabled = false;
     (ctx as any).mozImageSmoothingEnabled = false;
@@ -64,21 +68,67 @@ const loadingScreen = document.getElementById('loading-screen') as HTMLElement;
 const loadingBarFill = document.getElementById('loading-bar-fill') as HTMLElement;
 const loadingText = document.getElementById('loading-text') as HTMLElement;
 const btnStartGame = document.getElementById('btn-start-game') as HTMLElement;
+const btnRetryLoading = document.getElementById('btn-retry-loading') as HTMLElement;
+const loadingError = document.getElementById('loading-error') as HTMLElement;
 
 let gameStarted = false;
 let isEditorMode = false;
 let activeShopTab = 'food';
+
+const assetLoader = new AssetLoader();
+
+async function initGame() {
+  if (loadingError) {
+    loadingError.classList.add('hidden');
+    loadingError.textContent = '';
+  }
+  if (btnRetryLoading) btnRetryLoading.classList.add('hidden');
+  if (btnStartGame) btnStartGame.classList.add('hidden');
+
+  try {
+    await assetLoader.loadAll((percent, statusText) => {
+      if (loadingBarFill) loadingBarFill.style.width = `${percent}%`;
+      if (loadingText) loadingText.textContent = statusText;
+    });
+
+    if (loadingText) loadingText.textContent = 'Svět připraven! Klikni na tlačítko dole.';
+    if (btnStartGame) {
+      btnStartGame.classList.remove('hidden');
+      btnStartGame.style.display = 'block';
+    }
+  } catch (err: any) {
+    console.error('Initialization error:', err);
+    if (loadingText) loadingText.textContent = '❌ Inicializace selhala!';
+    if (loadingError) {
+      loadingError.textContent = err?.message || 'Nastala chyba při načítání herních modulů.';
+      loadingError.classList.remove('hidden');
+    }
+    if (btnRetryLoading) {
+      btnRetryLoading.classList.remove('hidden');
+      btnRetryLoading.style.display = 'block';
+    }
+  }
+}
+
+initGame();
+
+if (btnRetryLoading) {
+  btnRetryLoading.addEventListener('click', () => initGame());
+}
 
 function startGame(e?: Event) {
   if (e) {
     e.preventDefault();
     e.stopPropagation();
   }
+  if (gameStarted) return;
   gameStarted = true;
+
   if (loadingScreen) {
     loadingScreen.style.display = 'none';
     loadingScreen.classList.add('hidden');
   }
+  sounds.init();
   try { sounds.playSuccess(); } catch (_e) {}
   resizeCanvas();
 }
@@ -88,16 +138,6 @@ function startGame(e?: Event) {
 
 if (btnStartGame) {
   btnStartGame.addEventListener('click', startGame);
-  btnStartGame.addEventListener('pointerdown', startGame);
-  btnStartGame.addEventListener('touchstart', startGame);
-}
-
-// Ensure loading bar finishes and start button turns visible
-if (loadingBarFill) loadingBarFill.style.width = '100%';
-if (loadingText) loadingText.textContent = 'Příprava sveta dokončena!';
-if (btnStartGame) {
-  btnStartGame.classList.remove('hidden');
-  btnStartGame.style.display = 'block';
 }
 
 const keys: { [key: string]: boolean } = {};
@@ -134,12 +174,9 @@ canvas.addEventListener('click', (e) => {
   if (isModalOpen()) return;
 
   if (isEditorMode) {
-    const cameraX = state.player.x - canvas.width / 2;
-    const cameraY = state.player.y - canvas.height / 2;
-    const worldX = e.clientX + cameraX;
-    const worldY = e.clientY + cameraY;
+    const worldPos = renderer.screenToWorld(e.clientX, e.clientY, state);
 
-    if (state.isInsideHouse(worldX, worldY)) {
+    if (state.isInsideHouse(worldPos.x, worldPos.y)) {
       showToast('🪑 Předmět v domě přesunut!');
       sounds.playHit();
     } else {
@@ -166,6 +203,7 @@ function showToast(msg: string) {
 function triggerAttack() {
   state.player.isAttacking = true;
   sounds.playHit();
+  renderer.particleSystem.emitSparkles(state.player.x, state.player.y, 8, '#f1c40f');
 
   setTimeout(() => {
     state.player.isAttacking = false;
@@ -193,6 +231,7 @@ function checkFarmHarvest() {
         showToast('🚰 Vyčerpána studna (+40 Žízeň)!');
       }
       sounds.playCoin();
+      renderer.particleSystem.emitSparkles(farm.x, farm.y, 12, '#2ecc71');
     }
   }
 }
@@ -232,15 +271,19 @@ function handleMathAnswer(chosenOption: string) {
       if (enemyKilled) {
         sounds.playSuccess();
         sounds.playCoin();
+        renderer.particleSystem.emitFloatingText(state.player.x, state.player.y - 30, `+${coinsEarned} 🪙`, '#f1c40f');
+        renderer.particleSystem.emitSparkles(state.player.x, state.player.y, 20, '#f1c40f');
         showToast(`🎉 Nepřítel poražen! Získal/a jsi ${coinsEarned} mincí!`);
       } else {
         sounds.playHit();
+        renderer.particleSystem.emitFloatingText(state.player.x, state.player.y - 30, 'ZÁSAH!', '#e74c3c');
         showToast('⚔️ Zásah! Nepřítel byl zasažen!');
       }
       mathModal.classList.add('hidden');
     },
     (damageTaken) => {
       sounds.playError();
+      renderer.particleSystem.emitFloatingText(state.player.x, state.player.y - 30, `-${damageTaken} HP`, '#e74c3c');
       showToast(`❌ Špatně! Nepřítel ti uštědřil ${damageTaken} poškození!`);
       mathModal.classList.add('hidden');
     }
@@ -330,8 +373,10 @@ function renderShopItems() {
   });
 }
 
-function update(_dt: number) {
+function update(dt: number) {
   if (isModalOpen()) return;
+
+  const frameFactor = dt * 60;
 
   let dx = 0;
   let dy = 0;
@@ -346,8 +391,8 @@ function update(_dt: number) {
     dy *= 0.7071;
   }
 
-  state.player.x = Math.max(20, Math.min(state.mapSize.width - 20, state.player.x + dx * state.player.speed));
-  state.player.y = Math.max(20, Math.min(state.mapSize.height - 20, state.player.y + dy * state.player.speed));
+  state.player.x = Math.max(20, Math.min(state.mapSize.width - 20, state.player.x + dx * state.player.speed * frameFactor));
+  state.player.y = Math.max(20, Math.min(state.mapSize.height - 20, state.player.y + dy * state.player.speed * frameFactor));
 
   for (const enemy of state.enemies) {
     const edx = state.player.x - enemy.x;
@@ -356,13 +401,13 @@ function update(_dt: number) {
 
     const inHouse = state.isInsideHouse(state.player.x, state.player.y);
     if (dist < 350 && dist > 30 && !inHouse) {
-      enemy.x += (edx / dist) * enemy.speed;
-      enemy.y += (edy / dist) * enemy.speed;
+      enemy.x += (edx / dist) * enemy.speed * frameFactor;
+      enemy.y += (edy / dist) * enemy.speed * frameFactor;
     }
   }
 
-  state.updateTime();
-  state.updateSurvival();
+  state.updateTime(dt);
+  state.updateSurvival(dt);
 
   updateHUD();
 }
@@ -385,8 +430,18 @@ function updateHUD() {
   coinCount.textContent = state.player.coins.toString();
 }
 
-function loop() {
+let lastTime = performance.now();
+
+function loop(now: number) {
+  const dt = Math.min((now - lastTime) / 1000, 0.1);
+  lastTime = now;
+
+  if (gameStarted) {
+    update(dt);
+  }
+  renderer.update(dt);
   renderer.render(state, isEditorMode);
+
   requestAnimationFrame(loop);
 }
 

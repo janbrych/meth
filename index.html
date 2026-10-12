@@ -34,7 +34,9 @@
           <div id="loading-bar-fill" class="loading-bar-fill"></div>
         </div>
         <div id="loading-text" class="loading-text">Načítání herního kódu...</div>
-        <button id="btn-start-game" class="pixel-btn start-btn hidden" onclick="window.__forceStartGame && window.__forceStartGame(event)">▶️ SPUSTIT HRU</button>
+        <button id="btn-start-game" class="pixel-btn start-btn hidden">▶️ SPUSTIT HRU</button>
+        <button id="btn-retry-loading" class="pixel-btn start-btn hidden" style="background: #c0392b; border-color: #e74c3c; margin-top: 10px;">🔄 OPAKOVAT NAČÍTÁNÍ</button>
+        <div id="loading-error" class="hidden" style="color: #ff6b6b; font-size: 10px; margin-top: 10px; line-height: 1.4;"></div>
       </div>
     </div>
 
@@ -133,40 +135,6 @@
     </div>
   </div>
 
-  <script>
-    // Fallback loading animation driver directly in HTML head/body
-    (function() {
-      var progress = 0;
-      var timer = setInterval(function() {
-        progress += 10;
-        var bar = document.getElementById('loading-bar-fill');
-        if (bar) bar.style.width = Math.min(100, progress) + '%';
-        if (progress >= 100) {
-          clearInterval(timer);
-          var txt = document.getElementById('loading-text');
-          if (txt) txt.textContent = 'Svět připraven! Klikni na tlačítko dole.';
-          var btn = document.getElementById('btn-start-game');
-          if (btn) {
-            btn.classList.remove('hidden');
-            btn.style.display = 'block';
-          }
-        }
-      }, 100);
-
-      window.__forceStartGame = function(e) {
-        if (e && e.preventDefault) e.preventDefault();
-        var screen = document.getElementById('loading-screen');
-        if (screen) {
-          screen.style.display = 'none';
-          screen.style.visibility = 'hidden';
-          screen.classList.add('hidden');
-        }
-        if (typeof window.__onGameStart === 'function') {
-          window.__onGameStart();
-        }
-      };
-    })();
-  </script>
   <script type="module" src="./src/main.ts"></script>
 </body>
 </html>
