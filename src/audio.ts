@@ -1,6 +1,10 @@
 class SoundEngine {
   private ctx: AudioContext | null = null;
 
+  public init() {
+    this.initCtx();
+  }
+
   private initCtx() {
     try {
       if (!this.ctx) {

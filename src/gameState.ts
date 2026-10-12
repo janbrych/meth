@@ -221,10 +221,12 @@ export class GameState {
     );
   }
 
-  updateTime() {
-    this.worldTime.tickCounter++;
+  private survivalTimer = 0;
+
+  updateTime(dt: number = 1 / 60) {
+    this.worldTime.tickCounter += dt * 60;
     if (this.worldTime.tickCounter >= 20) {
-      this.worldTime.tickCounter = 0;
+      this.worldTime.tickCounter -= 20;
       this.worldTime.minute++;
       if (this.worldTime.minute >= 60) {
         this.worldTime.minute = 0;
@@ -251,8 +253,10 @@ export class GameState {
     }
   }
 
-  updateSurvival() {
-    if (this.worldTime.tickCounter % 30 === 0) {
+  updateSurvival(dt: number = 1 / 60) {
+    this.survivalTimer += dt;
+    if (this.survivalTimer >= 0.5) {
+      this.survivalTimer = 0;
       this.player.hunger = Math.max(0, this.player.hunger - 0.1);
       this.player.thirst = Math.max(0, this.player.thirst - 0.15);
 
